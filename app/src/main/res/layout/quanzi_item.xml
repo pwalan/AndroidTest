@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="400dp"
+    android:descendantFocusability="blocksDescendants">
+
+    <RelativeLayout
+        android:id="@+id/r1"
+        android:layout_width="match_parent"
+        android:layout_height="80dp">
+
+
+        <com.pwalan.androidtest.RoundImageView
+            android:id="@+id/head"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:background="#00ffffff"
+            android:scaleType="fitCenter"
+            android:src="@drawable/head"
+            />
+
+        <TextView
+            android:id="@+id/name"
+            android:layout_toRightOf="@id/head"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="pw"
+            android:textSize="30dp"
+            />
+        <TextView
+            android:id="@+id/time"
+            android:layout_toRightOf="@id/head"
+            android:layout_below="@id/name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="10dp"
+            android:text="2016-03-26"
+            android:textSize="20dp"
+            />
+
+        <CheckBox
+            android:id="@+id/cb_favorite"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:background="@drawable/vote"
+            android:button="@null"
+            android:checked="false"
+            android:layout_margin="10dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+
+    </RelativeLayout>
+
+    <ImageView
+        android:id="@+id/picture"
+        android:layout_below="@id/r1"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="fitStart"
+        android:src="@drawable/head"
+        />
+
+</RelativeLayout>

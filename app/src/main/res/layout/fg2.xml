@@ -10,4 +10,13 @@
         android:layout_height="wrap_content"
         android:text="第二个页面"
         android:textSize="22sp"/>
+
+    <ListView
+        android:id="@+id/fg2list"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:divider="#ffffff"
+        android:dividerHeight="2dp">
+    </ListView>
+
 </LinearLayout>
