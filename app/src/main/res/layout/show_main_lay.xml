@@ -112,10 +112,10 @@
                 android:orientation="vertical">
                 <ImageView
                     android:id="@+id/fourth_image"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
                     android:layout_gravity="center_horizontal"
-                    android:src="@android:drawable/ic_menu_myplaces" />
+                    android:src="@drawable/user" />
                 <TextView
                     android:id="@+id/fourth_text"
                     android:layout_width="wrap_content"
