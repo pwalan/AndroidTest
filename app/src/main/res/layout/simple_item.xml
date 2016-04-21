@@ -8,7 +8,8 @@
         android:id="@+id/shared_pictures"
         android:layout_width="180dp"
         android:layout_height="100dp"
-        android:layout_margin="10dp" />
+        android:layout_margin="10dp"
+        android:scaleType="center" />
 
     <TextView
         android:id="@+id/picture_name"
