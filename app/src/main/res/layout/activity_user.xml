@@ -19,12 +19,14 @@
 
     <com.pwalan.androidtest.RoundImageView
         android:id="@+id/head"
+        android:layout_margin="5dp"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:src="@drawable/head"/>
 
     <Button
         android:id="@+id/btn_up"
+        android:layout_margin="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00000000"
@@ -32,6 +34,7 @@
 
     <Button
         android:id="@+id/btn_down"
+        android:layout_margin="5dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="#00000000"
@@ -39,7 +42,10 @@
 
     <TextView
         android:id="@+id/tv_result"
+        android:layout_margin="5dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:text="结果"
+        android:textSize="16dp"/>
 
 </LinearLayout>
