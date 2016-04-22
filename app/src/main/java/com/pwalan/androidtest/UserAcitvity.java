@@ -21,6 +21,8 @@ import android.widget.Toast;
 import com.pwalan.androidtest.upload.SelectPicActivity;
 import com.pwalan.androidtest.upload.UploadUtil;
 
+import org.w3c.dom.Text;
+
 import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,6 +72,9 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_user);
+
+        tv_result=(TextView)findViewById(R.id.tv_result);
+
         head=(RoundImageView)findViewById(R.id.head);
         head.setOnClickListener(this);
 
@@ -139,7 +144,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
     private void toUploadFile()
     {
         tv_result.setText("正在上传中...");
-        progressDialog.setMessage("正在上传文件...");
+        progressDialog.setMessage("正在上传...");
         progressDialog.show();
         String fileKey = "img";
         UploadUtil uploadUtil = UploadUtil.getInstance();

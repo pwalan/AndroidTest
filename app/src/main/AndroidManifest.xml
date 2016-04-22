@@ -35,6 +35,10 @@
             android:label="@string/title_activity_user_acitvity" >
         </activity>
 
+        <activity
+            android:name=".upload.SelectPicActivity"
+            android:theme="@android:style/Theme.Holo.Dialog.NoActionBar"/>
+
     </application>
 
 </manifest>
