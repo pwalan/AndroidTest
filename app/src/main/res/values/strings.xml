@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">FragmentTest</string>
+    <string name="app_name">AndroidTest</string>
 
     <string name="hello_world">Hello, world!"\n"你好，世界！</string>
     <string name="action_settings">Settings</string>
