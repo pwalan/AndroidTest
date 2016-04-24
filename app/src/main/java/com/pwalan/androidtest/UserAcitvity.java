@@ -6,33 +6,39 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.pwalan.androidtest.upload.SelectPicActivity;
-import com.pwalan.androidtest.upload.UploadUtil;
 
-import org.w3c.dom.Text;
-
+import java.io.BufferedReader;
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.util.UUID;
+
+import com.tencent.upload.UploadManager;
+import com.tencent.upload.Const.FileType;
+import com.tencent.upload.task.ITask;
+import com.tencent.upload.task.IUploadTaskListener;
+import com.tencent.upload.task.data.FileInfo;
+import com.tencent.upload.task.impl.PhotoUploadTask;
+
+import org.json.JSONObject;
 
 /**
  * 用户页面 用来测试上传和下载图片
  * 这里主要是选择图片和执行上传操作
  */
 
-public class UserAcitvity extends Activity implements View.OnClickListener,UploadUtil.OnUploadProcessListener {
+public class UserAcitvity extends Activity implements View.OnClickListener {
 
 
     private static final String TAG = "uploadImage";
@@ -56,15 +62,25 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
      * 上传中
      */
     private static final int UPLOAD_IN_PROCESS = 5;
-    /***
-     * 这里的这个URL是单前服务器的java EE环境URL，有需要的话要改
+
+    /**
+     * 要上传图片的本地地址
      */
-    private static String requestURL = "http://192.168.0.105:8080/AndroidServer/file_upload";
+    private String picPath = null;
+
+    /**
+     * 腾讯云上传管理类
+     */
+    private UploadManager photoUploadMgr;
+
+    String bucket = "pwalan-10035979.image.myqcloud.com";
+    String signUrl = "http://192.168.0.105::8080/AndroidServer/getSign";
+    String sign = null;
+    String result = null;
 
     private RoundImageView head;
     private Button btn_up,btn_down;
     private TextView tv_result;
-    private String picPath = null;
     private ProgressDialog progressDialog;
 
 
@@ -85,6 +101,12 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
         btn_down.setOnClickListener(this);
 
         progressDialog = new ProgressDialog(this);
+
+        //获取APP签名
+        getUploadImageSign(signUrl);
+        // 实例化Photo业务上传管理类
+        photoUploadMgr = new UploadManager(this, "10035979",
+                FileType.Photo, "qcloudphoto");
     }
 
     @Override
@@ -116,8 +138,6 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
             Bitmap bm = BitmapFactory.decodeFile(picPath);
             head.setImageBitmap(bm);
 
-
-
             //更新图库
 
             Uri localUri = Uri.fromFile(new File(picPath));
@@ -128,63 +148,37 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
     }
 
 
-    /**
-     * 上传服务器响应回调
-     */
-    @Override
-    public void onUploadDone(int responseCode, String message) {
-        progressDialog.dismiss();
-        Message msg = Message.obtain();
-        msg.what = UPLOAD_FILE_DONE;
-        msg.arg1 = responseCode;
-        msg.obj = message;
-        handler.sendMessage(msg);
-    }
-
-    private void toUploadFile()
-    {
-        tv_result.setText("正在上传中...");
-        progressDialog.setMessage("正在上传...");
-        progressDialog.show();
-        String fileKey = "img";
-        UploadUtil uploadUtil = UploadUtil.getInstance();
-        uploadUtil.setOnUploadProcessListener(this);  //设置监听器监听上传状态
-
-        Map<String, String> params = new HashMap<String, String>();
-        params.put("orderId", "11111");
-        uploadUtil.uploadFile( picPath,fileKey, requestURL,params);
-    }
-
-    @Override
-    public void onUploadProcess(int uploadSize) {
-        Message msg = Message.obtain();
-        msg.what = UPLOAD_IN_PROCESS;
-        msg.arg1 = uploadSize;
-        handler.sendMessage(msg);
-    }
-
-    @Override
-    public void initUpload(int fileSize) {
-        Message msg = Message.obtain();
-        msg.what = UPLOAD_INIT_PROCESS;
-        msg.arg1 = fileSize;
-        handler.sendMessage(msg );
-    }
 
     private Handler handler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case TO_UPLOAD_FILE:
-                    toUploadFile();
-                    break;
-                case UPLOAD_INIT_PROCESS:
-                    break;
-                case UPLOAD_IN_PROCESS:
-                    break;
-                case UPLOAD_FILE_DONE:
-                    String result = "响应码："+msg.arg1+"\n响应信息："+msg.obj+"\n耗时："+UploadUtil.getRequestTime()+"秒";
-                    tv_result.setText(result);
+                    //上传图片
+                    PhotoUploadTask task = new PhotoUploadTask(picPath,
+                            new IUploadTaskListener() {
+                                @Override
+                                public void onUploadSucceed(final FileInfo result) {
+                                    Log.i("Demo", "upload succeed: " + result.url);
+                                }
+                                @Override
+                                public void onUploadStateChange(ITask.TaskState state) {
+                                }
+                                @Override
+                                public void onUploadProgress(long totalSize, long sendSize){
+                                    long p = (long) ((sendSize * 100) / (totalSize * 1.0f));
+                                    Log.i("Demo", "上传进度: " + p + "%");
+                                }
+                                @Override
+                                public void onUploadFailed(final int errorCode, final String errorMsg){
+                                    Log.i("Demo", "上传结果:失败! ret:" + errorCode + " msg:" + errorMsg);
+                                }
+                            }
+                    );
+                    task.setBucket(bucket); // 设置 Bucket(可选)
+                    task.setFileId("test_fileId_" + UUID.randomUUID()); // 为图片自定义 FileID(可选)
+                    task.setAuth(sign);
+                    photoUploadMgr.upload(task); // 开始上传
                     break;
 
                 default:
@@ -193,5 +187,33 @@ public class UserAcitvity extends Activity implements View.OnClickListener,Uploa
             super.handleMessage(msg);
         }
     };
+
+    // 获取app 的签名
+    private void getUploadImageSign(final String s) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                // TODO Auto-generated method stub
+                try {
+                    URL url = new URL(s);
+                    HttpURLConnection urlConnection = (HttpURLConnection) url
+                            .openConnection();
+                    InputStreamReader in = new InputStreamReader(urlConnection
+                            .getInputStream());
+                    BufferedReader buffer = new BufferedReader(in);
+                    String inpuLine = null;
+                    while ((inpuLine = buffer.readLine()) != null) {
+                        result = inpuLine + "\n";
+                    }
+                    JSONObject jsonData = new JSONObject(result);
+                    sign = jsonData.getString("sign");
+                    Log.i("Demo", "SIGN: "+sign);
+                } catch (Exception e) {
+                    // TODO: handle exception
+                }
+            }
+        }).start();
+
+    }
 }
 
