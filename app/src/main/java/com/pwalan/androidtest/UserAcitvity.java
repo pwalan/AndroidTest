@@ -1,6 +1,7 @@
 package com.pwalan.androidtest;
 
 import android.app.Activity;
+import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -74,7 +75,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
     private UploadManager photoUploadMgr;
 
     String bucket = "pwalan-10035979.image.myqcloud.com";
-    String signUrl = "http://192.168.0.105::8080/AndroidServer/getSign";
+    String signUrl = null;
     String sign = null;
     String result = null;
 
@@ -82,6 +83,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
     private Button btn_up,btn_down;
     private TextView tv_result;
     private ProgressDialog progressDialog;
+    private App app;
 
 
     @Override
@@ -102,7 +104,10 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
 
         progressDialog = new ProgressDialog(this);
 
+        app=(App)getApplication();
+
         //获取APP签名
+        signUrl=app.getServer()+"getSign";
         getUploadImageSign(signUrl);
         // 实例化Photo业务上传管理类
         photoUploadMgr = new UploadManager(this, "10035979",
