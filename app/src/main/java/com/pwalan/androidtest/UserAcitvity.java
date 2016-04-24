@@ -20,8 +20,11 @@ import com.pwalan.androidtest.upload.SelectPicActivity;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.UUID;
 
@@ -64,6 +67,9 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
      */
     private static final int UPLOAD_IN_PROCESS = 5;
 
+    //下载
+    protected static final int DOWNLOAD_FILE_DONE = 6;
+
     /**
      * 要上传图片的本地地址
      */
@@ -85,6 +91,8 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
     private ProgressDialog progressDialog;
     private App app;
 
+    private Bitmap bitmap;
+    private String url=null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,9 +138,51 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
                     Toast.makeText(this, "上传的文件路径出错", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case R.id.btn_down:
+               /* String url="http://photo01-10023565.video.myqcloud.com/20160329_024231.jpg";
+                Bitmap bitmap = getHttpBitmap(url);
+                head.setImageBitmap(bitmap);*/
+                url="http://photo01-10023565.video.myqcloud.com/20160329_024231.jpg";
+                getHttpBitmap(url);
+                break;
             default:
                 break;
         }
+    }
+
+    /**
+     * 获取网落图片资源
+     * @param url
+     */
+    public void getHttpBitmap(final String url){
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try{
+                    URL myFileURL = new URL(url);
+                    //获得连接
+                    HttpURLConnection conn=(HttpURLConnection)myFileURL.openConnection();
+                    //设置超时时间为6000毫秒，conn.setConnectionTiem(0);表示没有时间限制
+                    conn.setConnectTimeout(6000);
+                    //连接设置获得数据流
+                    conn.setDoInput(true);
+                    //不使用缓存
+                    conn.setUseCaches(false);
+                    //这句可有可无，没有影响
+                    //conn.connect();
+                    //得到数据流
+                    InputStream is = conn.getInputStream();
+                    //解析得到图片
+                    bitmap = BitmapFactory.decodeStream(is);
+                    //关闭数据流
+                    is.close();
+
+                    handler.sendEmptyMessage(DOWNLOAD_FILE_DONE);
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -187,6 +237,9 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
                     photoUploadMgr.upload(task); // 开始上传
                     break;
 
+                case DOWNLOAD_FILE_DONE:
+                    head.setImageBitmap(bitmap);
+                    break;
                 default:
                     break;
             }
