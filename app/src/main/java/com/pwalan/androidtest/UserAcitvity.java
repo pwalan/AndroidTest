@@ -74,10 +74,10 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
      */
     private UploadManager photoUploadMgr;
 
-    String bucket = "pwalan-10035979.image.myqcloud.com";
-    String signUrl = null;
-    String sign = null;
-    String result = null;
+    String bucket;
+    String signUrl;
+    String sign;
+    String result;
 
     private RoundImageView head;
     private Button btn_up,btn_down;
@@ -106,6 +106,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
 
         app=(App)getApplication();
 
+        bucket="pwalan";
         //获取APP签名
         signUrl=app.getServer()+"getSign";
         getUploadImageSign(signUrl);
@@ -200,6 +201,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
             public void run() {
                 // TODO Auto-generated method stub
                 try {
+                    Log.d("Demo","Start getSign");
                     URL url = new URL(s);
                     HttpURLConnection urlConnection = (HttpURLConnection) url
                             .openConnection();
@@ -212,7 +214,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
                     }
                     JSONObject jsonData = new JSONObject(result);
                     sign = jsonData.getString("sign");
-                    Log.i("Demo", "SIGN: "+sign);
+                    Log.i("Sign", "SIGN: "+sign);
                 } catch (Exception e) {
                     // TODO: handle exception
                 }
