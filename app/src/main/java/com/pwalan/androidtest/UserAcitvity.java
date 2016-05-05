@@ -1,7 +1,6 @@
 package com.pwalan.androidtest;
 
 import android.app.Activity;
-import android.app.Application;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,26 +15,14 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.pwalan.androidtest.upload.QCloud;
 import com.pwalan.androidtest.upload.SelectPicActivity;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.UUID;
 
-import com.tencent.upload.UploadManager;
-import com.tencent.upload.Const.FileType;
-import com.tencent.upload.task.ITask;
-import com.tencent.upload.task.IUploadTaskListener;
-import com.tencent.upload.task.data.FileInfo;
-import com.tencent.upload.task.impl.PhotoUploadTask;
-
-import org.json.JSONObject;
 
 /**
  * 用户页面 用来测试上传和下载图片
@@ -75,15 +62,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
      */
     private String picPath = null;
 
-    /**
-     * 腾讯云上传管理类
-     */
-    private UploadManager photoUploadMgr;
 
-    String bucket;
-    String signUrl;
-    String sign;
-    String result;
 
     private RoundImageView head;
     private Button btn_up,btn_down;
@@ -100,6 +79,7 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
         setContentView(R.layout.activity_user);
 
         tv_result=(TextView)findViewById(R.id.tv_result);
+        tv_result.setOnClickListener(this);
 
         head=(RoundImageView)findViewById(R.id.head);
         head.setOnClickListener(this);
@@ -114,13 +94,8 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
 
         app=(App)getApplication();
 
-        bucket="pwalan";
-        //获取APP签名
-        signUrl=app.getServer()+"getSign";
-        getUploadImageSign(signUrl);
-        // 实例化Photo业务上传管理类
-        photoUploadMgr = new UploadManager(this, "10035979",
-                FileType.Photo, "qcloudphoto");
+        //腾讯云上传初始化
+        QCloud.init(app.getServer()+"getSign",this);
     }
 
     @Override
@@ -144,6 +119,9 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
                 head.setImageBitmap(bitmap);*/
                 url="http://photo01-10023565.video.myqcloud.com/20160329_024231.jpg";
                 getHttpBitmap(url);
+                break;
+            case R.id.tv_result:
+                tv_result.setText(QCloud.resultUrl);
                 break;
             default:
                 break;
@@ -210,33 +188,8 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
         public void handleMessage(Message msg) {
             switch (msg.what) {
                 case TO_UPLOAD_FILE:
-                    //上传图片
-                    PhotoUploadTask task = new PhotoUploadTask(picPath,
-                            new IUploadTaskListener() {
-                                @Override
-                                public void onUploadSucceed(final FileInfo result) {
-                                    Log.i("Demo", "upload succeed: " + result.url);
-                                }
-                                @Override
-                                public void onUploadStateChange(ITask.TaskState state) {
-                                }
-                                @Override
-                                public void onUploadProgress(long totalSize, long sendSize){
-                                    long p = (long) ((sendSize * 100) / (totalSize * 1.0f));
-                                    Log.i("Demo", "上传进度: " + p + "%");
-                                }
-                                @Override
-                                public void onUploadFailed(final int errorCode, final String errorMsg){
-                                    Log.i("Demo", "上传结果:失败! ret:" + errorCode + " msg:" + errorMsg);
-                                }
-                            }
-                    );
-                    task.setBucket(bucket); // 设置 Bucket(可选)
-                    task.setFileId("test_fileId_" + UUID.randomUUID()); // 为图片自定义 FileID(可选)
-                    task.setAuth(sign);
-                    photoUploadMgr.upload(task); // 开始上传
+                    QCloud.UploadPic(picPath, UserAcitvity.this);
                     break;
-
                 case DOWNLOAD_FILE_DONE:
                     head.setImageBitmap(bitmap);
                     break;
@@ -247,33 +200,6 @@ public class UserAcitvity extends Activity implements View.OnClickListener {
         }
     };
 
-    // 获取app 的签名
-    private void getUploadImageSign(final String s) {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                // TODO Auto-generated method stub
-                try {
-                    Log.d("Demo","Start getSign");
-                    URL url = new URL(s);
-                    HttpURLConnection urlConnection = (HttpURLConnection) url
-                            .openConnection();
-                    InputStreamReader in = new InputStreamReader(urlConnection
-                            .getInputStream());
-                    BufferedReader buffer = new BufferedReader(in);
-                    String inpuLine = null;
-                    while ((inpuLine = buffer.readLine()) != null) {
-                        result = inpuLine + "\n";
-                    }
-                    JSONObject jsonData = new JSONObject(result);
-                    sign = jsonData.getString("sign");
-                    Log.i("Sign", "SIGN: "+sign);
-                } catch (Exception e) {
-                    // TODO: handle exception
-                }
-            }
-        }).start();
 
-    }
 }
 
