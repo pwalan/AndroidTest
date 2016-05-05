@@ -31,7 +31,7 @@
         android:textColor="@color/bg_color"/>
 
     <ImageView
-        android:id="@+id/up"
+        android:id="@+id/img_up"
         android:layout_width="40dp"
         android:layout_height="40dp"
         android:layout_alignParentRight="true"

@@ -10,6 +10,7 @@
     <string name="fg2_name">发现</string>
     <string name="fg3_name">记录</string>
     <string name="fg4_name">我的</string>
+    <string name="title_activity_upload">Upload</string>
 
 
 </resources>

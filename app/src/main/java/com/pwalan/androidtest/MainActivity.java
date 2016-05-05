@@ -20,6 +20,7 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
     // 初始化顶部栏显示
     private ImageView titleLeftImv;
     private TextView titleTv;
+    private ImageView img_up;
     // 定义4个Fragment对象
     private FirstFragment fg1;
     private SecondFragment fg2;
@@ -66,6 +67,13 @@ public class MainActivity extends FragmentActivity implements View.OnClickListen
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(MainActivity.this, UserAcitvity.class));
+            }
+        });
+        img_up=(ImageView)findViewById(R.id.img_up);
+        img_up.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(MainActivity.this,UploadActivity.class));
             }
         });
         titleTv = (TextView) findViewById(R.id.title_text_tv);
