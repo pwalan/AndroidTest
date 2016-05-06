@@ -51,7 +51,6 @@ public class QCloud {
      * @param con 上下文（用来显示结果）
      */
     public static void UploadPic(String picPath, final Context con){
-        Toast.makeText(con,"上传中，请稍后...",Toast.LENGTH_SHORT).show();
         resultUrl="";
         PhotoUploadTask task = new PhotoUploadTask(picPath,
                 new IUploadTaskListener() {
@@ -66,6 +65,7 @@ public class QCloud {
                     }
                     @Override
                     public void onUploadProgress(long totalSize, long sendSize){
+                        Toast.makeText(con,"上传中，请稍后...",Toast.LENGTH_SHORT).show();
                         long p = (long) ((sendSize * 100) / (totalSize * 1.0f));
                         Log.i("Demo", "上传进度: " + p + "%");
                     }
